@@ -1,0 +1,8 @@
+---
+layout: post
+title:  "紙吹雪を作る"
+---
+
+# 紙を作ろう
+
+<iframe style="width: 100%; height: 640pt;" allowfullscreen src="https://yasshi2525.github.io/playground/#/edit/eyJ0eXBlIjoiZ2FtZUpzb25VcmkiLCJuYW1lIjoiaGVsbG93b3JsZCIsInVyaSI6Imh0dHBzOi8veWFzc2hpMjUyNS5naXRodWIuaW8vcGxheWdyb3VuZC9wcmVzZXRzL2RlZmF1bHQvZ2FtZS5qc29uIn0=?notab&amp;autoplay&amp;nodl"></iframe>
