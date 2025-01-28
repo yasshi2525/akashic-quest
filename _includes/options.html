@@ -1,0 +1,19 @@
+{%- assign defaults = site.data.playground.view[view].options -%}
+{%- assign anyMatched = false -%}
+{%- for op in defaults -%}
+    {%- assign key = op[0] %}
+    {%- assign value = op[1] %}
+    {%- if include[key] == false -%}
+        {%- continue -%}
+    {%- endif -%}
+    {%- if include[key] or value -%}
+        {%- if anyMatched == false -%}
+            ?
+        {%- endif -%}
+        {%- if anyMatched -%}
+            &amp;
+        {%- endif -%}
+        {{- op[0] -}}
+        {%- assign anyMatched = true -%}
+    {%- endif -%}
+{%- endfor -%}
