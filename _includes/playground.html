@@ -1,0 +1,19 @@
+{%- assign view = include.view | default: "preset" -%}
+{%- assign preset = include.preset | default: "default" -%}
+{%- assign height = include.height | default: 640 -%}
+
+{%- if site.data.playground.view[view].gameJsonQuery -%}
+    {%- capture gameJsonQuery -%}
+    {%- include gameJsonUri.html preset= preset -%}
+    {%- endcapture -%}
+{%- endif -%}
+{%- capture options -%}
+    {%- include options.html -%}
+{%- endcapture -%}
+<iframe
+    src="{{- site.data.playground.url -}}
+         {{- site.data.playground.view[view].path -}}
+         {{- gameJsonQuery -}}{{- options -}}"
+    style="width: 100%; height: {{- height -}}pt;"
+    allowfullscreen 
+></iframe>

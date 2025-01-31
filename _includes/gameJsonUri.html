@@ -1,0 +1,9 @@
+{%- assign name = include.preset | default: "default" -%}
+{%- capture param -%}
+{
+  "type": "gameJsonUri",
+  "name": "{{ name }}",
+  "uri": "{{ site.data.playground.url }}/presets/{{ name }}/game.json"
+}
+{%- endcapture -%}
+{{- param | normalize_whitespace | base64_encode | normalize_whitespace -}}

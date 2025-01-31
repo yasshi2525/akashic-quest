@@ -1,0 +1,31 @@
+url: https://yasshi2525.github.io/playground
+view:
+  edit:
+    path: "/#/edit/"
+    options:
+      nodl: true
+    gameJsonQuery: true
+  preset:
+    path: "/#/presets/"
+    options:
+      nodl: true
+    gameJsonQuery: false
+  sample:
+    path: "/#/samples/"
+    options:
+      nodl: true
+      autoplay: true
+    gameJsonQuery: true
+  snippet:
+    path: "/#/snippets/"
+    options:
+      nodl: true
+      autoplay: true
+      notab: true
+    gameJsonQuery: true
+  download:
+    path: "/#/download/"
+    options:
+      autoStart: true
+      autoClose: true
+    gameJsonQuery: true
