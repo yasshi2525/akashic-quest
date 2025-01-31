@@ -1,5 +1,6 @@
 {%- assign view = include.view | default: "preset" -%}
 {%- assign preset = include.preset | default: "default" -%}
+{%- assign height = include.height | default: 640 -%}
 
 {%- if site.data.playground.view[view].gameJsonQuery -%}
     {%- capture gameJsonQuery -%}
@@ -13,6 +14,6 @@
     src="{{- site.data.playground.url -}}
          {{- site.data.playground.view[view].path -}}
          {{- gameJsonQuery -}}{{- options -}}"
-    style="width: 100%; height: 640pt;"
+    style="width: 100%; height: {{- height -}}pt;"
     allowfullscreen 
 ></iframe>

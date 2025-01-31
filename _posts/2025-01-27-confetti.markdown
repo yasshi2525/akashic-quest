@@ -3,6 +3,42 @@ layout: post
 title: "紙吹雪を作る"
 ---
 
+紙吹雪が舞う演出を作ってみましょう.
+
+作業はブラウザ上で完結します. ツールのインストールは要りません.
+コードを記述 → 実行 を繰り返すことで体感的な理解を目指します.
+
+# 想定する読者
+
+- JavaScript の基本的な命令 (変数, if, for) を聞いたことがあるが、自分でコードを書いたことはない
+- Akashic Engine を使ったことがない
+
 # 紙を作ろう
 
-{% include playground.html view="snippet" %}
+まずは 1 枚の紙を画面上に表示させましょう.
+下記がスタート地点です. 画面の ▶️ ボタンを押すとプログラムが実行されます.
+今は何も作ってないので何も起こりません. 4行目にコードを書いていきます.
+
+```javascript
+// ゲーム本体の処理
+```
+
+{% include playground.html view="edit" preset="confetti/1" height=350 %}
+
+早速ですが、以下のコードを4行目に書くと紙っぽいものが画面に表示されます.
+
+```javascript
+const paper = new g.FilledRect({
+  scene,
+  x: g.game.width / 2,
+  y: 50,
+  width: 25,
+  height: 25,
+  anchorX: 0.5,
+  anchorY: 0.5,
+  cssColor: "red",
+});
+scene.append(paper);
+```
+
+{% include playground.html view="edit" preset="confetti/2" height=400 %}
