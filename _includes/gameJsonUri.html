@@ -6,4 +6,9 @@
   "uri": "{{ site.data.playground.url }}/presets/{{ name }}/game.json"
 }
 {%- endcapture -%}
-{{- param | normalize_whitespace | base64_encode | normalize_whitespace -}}
+{%- comment -%}
+本来はbase64にしなければならないが、
+jekyll+GitHubではできないためURLエンコードを受け入れるよう
+playground側を修正した
+{%- endcomment -%}
+{{- param | normalize_whitespace | url_encode -}}
