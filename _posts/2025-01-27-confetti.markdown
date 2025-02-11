@@ -157,7 +157,7 @@ paper.onUpdate.add(() => {
 なんとなく紙が回転しているように見せることができましたが、無機質でどこか違和感がありますね.
 実は回転を表す場合、三角関数を使うとリアルに見せられます.
 そこで四角形の高さ `height` が _sin_ を表す `Math.sin()` に応じて変化するようにします.
-_sin_ は -1 から 1 の値をとるため、紙の大きさ `25` をかけることで紙の高さに変換します.
+_sin_ は -1 から 1 の値をとるため、紙の大きさ `25` をかけることで紙の高さに変換します (7-8 行目).
 
 ```javascript
 paper.height = Math.sin(theta) * 25;
@@ -167,7 +167,7 @@ theta += 0.1;
 _sin_ の入力値 `theta` は紙の回転角を表しています. 回転し続けるよう 0.1 足します.
 これにより回転角が 0.1 ずつ増え、そのたびに紙の高さが変わっていく挙動を表現できます.
 
-`theta` は `0` で初期化します.
+`theta` は `0` で初期化します (5 行目).
 
 {% include playground.html view="edit" preset="confetti/8" height=400 %}
 
@@ -176,7 +176,7 @@ _sin_ の入力値 `theta` は紙の回転角を表しています. 回転し続
 ## 左右方向にも回転させてみる
 
 実際には上下方向だけでなく左右方向にも回転するので、よりリアルにしてみましょう.
-四角形の幅 `width` が _cos_ を表す `Math.cos()` に応じて変化させてみましょう.
+四角形の幅 `width` が _cos_ を表す `Math.cos()` に応じて変化させてみましょう (7 行目).
 
 ```diff
 + paper.width = Math.cos(theta) * 25;
@@ -188,7 +188,7 @@ _sin_ の入力値 `theta` は紙の回転角を表しています. 回転し続
 
 あれれ? さっきより違和感が増してしまいました. 実は数学的には間違ったことをしているためです.
 元に戻しましょう. Akashic Engine のお作法で `angle` という値を設定すると四角形をコマのように回転させることができます.
-こちらを試してみましょう. (実際のゲーム開発もこのように試行錯誤しながらブラッシュアップさせていきます.)
+7 行目をこれに直してみましょう. (実際のゲーム開発もこのように試行錯誤しながらブラッシュアップさせていきます.)
 (補足: `Math.sin` は JavaScript の命令のためラジアン単位、`paper.angle` は Akashic Engine の命令のため度数単位です.)
 
 ```diff
@@ -201,3 +201,163 @@ _sin_ の入力値 `theta` は紙の回転角を表しています. 回転し続
 {% include playground.html view="edit" preset="confetti/10" height=400 %}
 
 それっぽくなりましたね!
+
+# ひらひらと舞うようにする
+
+ひらひらと舞わせてみましょう. x 座標を _cos_ で変化させてみます.
+振れ幅を `20` としてみます (10 行目). `g.game.width` は Akashic Engine のお作法で画面の横幅です.
+
+```javascript
+paper.x = g.game.width / 2 + Math.cos(theta) * 20;
+```
+
+{% include playground.html view="edit" preset="confetti/11" height=400 %}
+
+いかがでしょうか.
+
+# 紙の角度によって色の度合いを変える
+
+影を色づけてみましょう. 四角形の上に半透明で同じ形の四角形を乗せることで影を表現します.
+`paper` と同じ場所・形の `shadow` を作成します.
+
+```javascript
+const shadow = new g.FilledRect({
+  scene,
+  x: paper.x,
+  y: paper.y,
+  width: paper.width,
+  height: paper.height,
+  anchorX: paper.anchorX,
+  anchorY: paper.anchorY,
+  cssColor: "black",
+  opacity: 0,
+});
+```
+
+`paper` と同じように変化させていきます.
+
+```javascript
+shadow.onUpdate.add(() => {
+  shadow.x = paper.x;
+  shadow.y = paper.y;
+  shadow.angle = paper.angle;
+  shadow.height = paper.height;
+  shadow.opacity = Math.abs(Math.cos(theta));
+  shadow.modified();
+  if (shadow.y > g.game.height + 50) {
+    shadow.destroy();
+  }
+});
+```
+
+影っぽく見せるのは 24 行目 `shadow.opacity = Math.abs(Math.cos(theta));` です.
+`opacity` は透明度の設定です (`0-1`). _cos_ は `-1` から `+1` を取るので絶対値 `Math.abs()` をとって値を合わせます.
+
+{% include playground.html view="edit" preset="confetti/12" height=400 %}
+
+紙が細くなった際に色が濃くなりましたね.
+
+# 紙をたくさん落とす
+
+1 枚の紙の動きを定義できたので、関数にして任意のタイミングで紙を生成するようにします.
+今まで書いた `paper` と `shadow` の初期化処理・描画時の処理を `createPaper()` 関数の定義にします.
+
+```javascript
+const createPaper = () => {
+  const paper = new g.FilledRect(/* ... */);
+  let theta = 0;
+  paper.onUpdate.add(() => {
+    /* ... */
+  });
+  scene.append(paper);
+  const shadow = new g.FilledRect(/* ... */);
+  shadow.onUpdate.add(() => {
+    /* ... */
+  });
+  scene.append(shadow);
+};
+```
+
+これをランダムに呼び出します. Akashic Engine のお作法で、 `g.game.random.generate()` を実行すると `0` 以上 `1` 未満の数を返します.
+`0.01` 以下なら `createPaper()` を呼び出すとすれば、 1% の確率で紙を生成させることができます.
+
+```javascript
+scene.onUpdate.add(() => {
+  if (g.game.random.generate() < 0.01) {
+    createPaper();
+  }
+});
+```
+
+{% include playground.html view="edit" preset="confetti/13" height=700 %}
+
+紙が次々と落ちてくるようになりましたね!
+
+## いろいろな場所から紙を落とす
+
+初期 x 座標を乱数にしてみましょう. `g.game.random.generate() * g.game.width` で画面横幅の内どこかに生成されます.
+
+```diff
+- const createPaper = () => {
++ const createPaper = (initX) => {
+- const paper = new g.FilledRect({ scene, x: g.game.width / 2, y: -100, /* ... */ });
++ const paper = new g.FilledRect({ scene, x: initX, y: -100, /* ... */ });
+  /* ... */
+- paper.x = g.game.width / 2 + Math.cos(theta) * 20;
++ paper.x = initX + Math.cos(theta) * 20;
+  /* ... */
+- createPaper();
++ createPaper(g.game.random.generate() * g.game.width);
+```
+
+{% include playground.html view="edit" preset="confetti/14" height=700 %}
+
+色々なところから紙が落ちてくるようになりましたね! 34 行目の `0.01` を大きな値にすると大量の紙が舞うようになります.
+
+# 色々な色の紙を落とす
+
+紙の色もランダムにしましょう. Akashic Engine では CSS における color 表記が使えるので、数値で色を指定できます.
+`#${color.toString(16)}` で整数 `color` を色に変換できます.
+ランダムな整数は `Math.floor(g.game.random.generate() * 0xffffff)` で作成します.
+`g.game.random.generate()` は小数なので `Math.floor()` で切り捨てます.
+
+```diff
+- const createPaper = (initX) => {
++ const createPaper = (initX, color) => {
+- const paper = new g.FilledRect({ /* ... */, cssColor: "red" });
++ const paper = new g.FilledRect({ /* ... */, cssColor: `#${color.toString(16)}` });
+  /* ... */
+- createPaper(g.game.random.generate() * g.game.width);
++ createPaper(g.game.random.generate() * g.game.width, Math.floor(g.game.random.generate() * 0xffffff));
+```
+
+{% include playground.html view="edit" preset="confetti/15" height=700 %}
+
+# 舞い方に個性をもたせる
+
+初期値が同じだと均質な演出になってしまうので、初期値にランダム性をもたせてみましょう.
+関数の引数が多くなってしまうため、オブジェクトにまとめました.
+
+```javascript
+if (g.game.random.generate() < 0.1) {
+  createPaper({
+    x: g.game.random.generate() * g.game.width,
+    size: 15 + g.game.random.generate() * 10,
+    angle: g.game.random.generate() * 360,
+    color: Math.floor(g.game.random.generate() * 0xffffff),
+    theta: g.game.random.generate() * Math.PI * 2,
+    dy: 0.5 + g.game.random.generate() * 1.5,
+    dw: 10 + g.game.random.generate() * 20,
+    da: g.game.random.generate() * 1.5,
+    dt: g.game.random.generate() * 0.1,
+  });
+}
+```
+
+{% include playground.html view="edit" preset="confetti/16" height=1280 %}
+
+いかがでしょうか. `createPaper()` の引数を変えてみるとどう挙動が変わるのか実感できると思います.
+
+# まとめ
+
+紙吹雪の演出を作りました.
